@@ -1,0 +1,44 @@
+Overall
+	No menu
+	Single Player
+	One Track
+	One Ship
+	Top View Cam
+	Time Attack Only
+	AutoRestart on Start / Collision / Lap completion
+	
+Graphic
+	3D
+	Unity Primitives only
+	Very Low Poly
+	few props (for speed & scale)
+	Default Sky & Sun
+	Blade Runner Mood & Palette ?
+	PBR Shading
+	No Texturing
+	No Post Effect
+	No Particle
+	No Damage
+	
+Physic
+	Ship Orientation
+	Ship Longitudinal Thrust
+	Low friction for translation (drifting required)
+	High friction for rotation
+	Constant Height
+	Collision with track environment meshes (restart)
+	Collision with checkpoint meshes (lap validation)
+	
+Control
+	Gamepad
+	Left stick for orientation
+	X button for thrust
+		
+HUD
+	Last 5 lap times
+	Best lap time
+		
+Sound
+	Thruster sample
+	Best Lap sample
+	Ambient music
