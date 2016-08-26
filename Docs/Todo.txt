@@ -1,0 +1,36 @@
+//Step#1
+Create a new Unity project
+Create a Plane  (1km x 1km)
+Create a BoxyShip (w = 3-4m, l = 9 m, h = 3m)
+Ship Altitude locked 1m above ground level
+F1 Track width ~15m
+
+//Step#2
+Yaw + Longitudinal translation with gamepad without physx
+
+//Step#3
+Lock Camera Top View of Ship
+Camera Angle based on Velocity or Longitudinal axis ? (average ?)
+Camera Altitude ? (fixed or based on Velocity ?)
+
+//Step#4
+Remove basic translations
+Longitudinal Thruster Physx
+Longitudinal Thruster Graphx (Cone when activated)
+Longitudinal Thruster Audio (Audio sample when activated)
+1 N = 1 kg × m / s2
+F22 Pratt&Whitney 1 engine = 156 000 Newtons
+F 22 weight when empty ~ 20t
+Sum F = ma
+a = Sum F / m = 15.6 m/s2
++ Look at unity rigidbody Drag and Angular Drag factor
+
+//Step#5
+Checkpoint Trigger Test (Audio sample)
+
+//Step#6
+Race Marshall which handle race progress
+Start position
+Restart function
+Restart if collision
+Display Lap Time
