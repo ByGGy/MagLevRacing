@@ -21,9 +21,10 @@ Longitudinal Thruster Audio (Audio sample when activated)
 1 N = 1 kg × m / s2
 F22 Pratt&Whitney 1 engine = 156 000 Newtons
 F 22 weight when empty ~ 20t
-Sum F = ma
-a = Sum F / m = 15.6 m/s2
+Sum(F) = ma
+a = Sum(F) / m = 15.6 m/s2
 + Look at unity rigidbody Drag and Angular Drag factor
++ Look at center of mass (Oriented Thrust ?)
 
 //Step#5
 Checkpoint Trigger Test (Audio sample)
