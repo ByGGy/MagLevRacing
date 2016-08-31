@@ -2,10 +2,20 @@
 
 public class EasyMove : MonoBehaviour
 {
-    private const float THRUST_MAX = 156000; //Newtons
+    private const float TORQUE_MAX = 500000; //Newtons
+    private const float THRUST_MAX = 200000; //Newtons
+    private const float THRUST_VECTORING_ANGLE_MAX = 20;  //°
 
     private float nozzleAngle;
     private bool isThrustActive;
+
+    public Transform CenterOfMass;
+    public Transform ThrusterPivot;
+
+    void Start()
+    {
+        GetComponent<Rigidbody>().centerOfMass = CenterOfMass.localPosition;
+    }
 
 	void Update()
 	{
@@ -17,9 +27,13 @@ public class EasyMove : MonoBehaviour
 	{
 		Rigidbody rigidbody = GetComponent<Rigidbody>();
 
-        rigidbody.AddTorque(0, nozzleAngle * THRUST_MAX*2, 0);
+        rigidbody.AddRelativeTorque(Vector3.up * nozzleAngle * TORQUE_MAX);
 
-		if (isThrustActive)
-		    rigidbody.AddForce(rigidbody.transform.forward * THRUST_MAX);
+	    if (isThrustActive)
+	    {
+            Quaternion thrustAngle = Quaternion.AngleAxis(-nozzleAngle * THRUST_VECTORING_ANGLE_MAX, rigidbody.transform.up);
+            Vector3 thrust = thrustAngle * rigidbody.transform.forward * THRUST_MAX;
+            rigidbody.AddForceAtPosition(thrust, ThrusterPivot.position);
+	    }
 	}
 }
