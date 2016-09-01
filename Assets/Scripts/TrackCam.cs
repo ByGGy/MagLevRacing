@@ -7,7 +7,9 @@ public class TrackCam : MonoBehaviour
 	
 	void LateUpdate()
 	{
-        transform.position = Target.position - Target.forward * 40 + Target.up * 40 - Target.GetComponent<Rigidbody>().velocity;
+	    Vector3 offset = Target.up - Target.forward  - Target.GetComponent<Rigidbody>().velocity.normalized;
+        offset.Normalize();
+        transform.position = Target.position + offset * (40 + Target.GetComponent<Rigidbody>().velocity.magnitude * 0.5f);
 		transform.LookAt(Target);
 	}
 }

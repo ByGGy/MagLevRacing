@@ -2,7 +2,7 @@
 
 public class EasyMove : MonoBehaviour
 {
-    private const float TORQUE_MAX = 500000; //Newtons
+    private const float TORQUE_MAX = 200000; //Newtons
     private const float THRUST_MAX = 200000; //Newtons
     private const float THRUST_VECTORING_ANGLE_MAX = 20;  //°
 
