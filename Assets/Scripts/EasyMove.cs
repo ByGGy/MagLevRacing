@@ -2,9 +2,9 @@
 
 public class EasyMove : MonoBehaviour
 {
-    private const float TORQUE_MAX = 200000; //Newtons
-    private const float THRUST_MAX = 200000; //Newtons
-    private const float THRUST_VECTORING_ANGLE_MAX = 20;  //°
+    private const float TORQUE_MAX = 90000; //Newtons
+    private const float THRUST_MAX = 180000; //Newtons
+    private const float THRUST_VECTORING_ANGLE_MAX = 30;  //°
 
     private float nozzleAngle;
     private bool isThrustActive;
@@ -27,7 +27,7 @@ public class EasyMove : MonoBehaviour
 	{
 		Rigidbody rigidbody = GetComponent<Rigidbody>();
 
-        rigidbody.AddRelativeTorque(Vector3.up * nozzleAngle * TORQUE_MAX);
+        rigidbody.AddRelativeTorque(rigidbody.transform.up * nozzleAngle * TORQUE_MAX);
 
 	    if (isThrustActive)
 	    {
