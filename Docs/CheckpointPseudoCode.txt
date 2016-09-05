@@ -1,0 +1,42 @@
+LapIntermediateTime
+	CheckpointNumber
+	TimeElapsed
+	
+Checkpoint
+	public uint Number;
+	boxCollider with trigger
+	
+	public event Action<Checkpoint> OnShipDetection;
+	
+	OnTriggerEnter(collider other)
+	{
+		//Need a Ship script to check the collision ?
+		if (other == ship)
+		{
+			if (OnShipDetected != null)
+				OnShipDetected.Invoke(this);
+		}
+	}
+	
+RaceMarshall
+	List<Checkpoint> checkpoints; (subscribe OnShipDetection)
+	List<LapIntermediateTime> lapTimes;
+	
+	float elapsedTime;
+	
+	FixedUpdate()
+	{
+		elapsedTime += fixedDeltaTime;
+	}
+	
+	OnShipDetectionHandler(Checkpoint cp)
+	{
+		if (cp.Number == lapTimes.Last().CheckpointNumber +1)
+		{
+			lapTimes.Add(new LapIntermediateTime(cp.Number, elapsedTime));
+			if (lapTimes.Count() == 1)
+				StartOfLap();
+			else lf lapTimes.Count() == checkpoints.Count()
+				EndOfLap();
+		}
+	}
