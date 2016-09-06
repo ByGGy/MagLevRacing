@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class TrackCam : MonoBehaviour
 {
@@ -7,9 +6,17 @@ public class TrackCam : MonoBehaviour
 	
 	void LateUpdate()
 	{
-	    Vector3 offset = Target.up - Target.forward  - Target.GetComponent<Rigidbody>().velocity.normalized;
+	    Vector3 offset = Target.up - Target.forward;
+
+	    float velocity = Target.GetComponent<Rigidbody>().velocity.magnitude;
+
+        if (velocity > Mathf.Epsilon)
+	        offset -= Target.GetComponent<Rigidbody>().velocity.normalized;
+        else
+            offset -= Target.forward;
+
         offset.Normalize();
-        transform.position = Target.position + offset * (20 + Target.GetComponent<Rigidbody>().velocity.magnitude * 0.5f);
+        transform.position = Target.position + offset * Mathf.Max(15, Target.GetComponent<Rigidbody>().velocity.magnitude * 0.3f);
 		transform.LookAt(Target);
 	}
 }
