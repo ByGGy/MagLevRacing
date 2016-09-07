@@ -22,18 +22,21 @@ public class RaceMarshall : MonoBehaviour
     private float elapsedTime;
     private List<LapIntermediateRecord> intermediateRecords;
 
+    public float ElapsedTime { get { return this.elapsedTime; } }
     public IEnumerable<LapIntermediateRecord> IntermediateRecords { get { return this.intermediateRecords; } }
 
     private void Start()
 	{
 	    this.checkpoints = GetComponentsInChildren<Checkpoint>().OrderBy(cp => cp.Id).ToList();
         this.checkpoints.ForEach(cp => cp.OnTargetDetected += OnCheckpointTriggered);
-        Debug.Log(this.checkpoints.Count);
+
+        this.isRecordingLap = false;
+        this.elapsedTime = 0;
+        this.intermediateRecords = new List<LapIntermediateRecord>();
 	}
 
     private void OnCheckpointTriggered(Checkpoint cp)
     {
-        Debug.Log(string.Format("Checkpoint {0}", cp.Id));
         if (cp.Id == this.checkpoints.First().Id)
         {
             if (!isRecordingLap)
@@ -42,12 +45,13 @@ public class RaceMarshall : MonoBehaviour
                 EndRecordingLap(cp);
         }
         else
-            RecordLap(cp)
+            RecordLap(cp);
     }
 
     private void FixedUpdate()
     {
-        this.elapsedTime += fixedDeltaTime;
+        if (this.isRecordingLap)
+            this.elapsedTime += Time.fixedDeltaTime;
     }
 
     private void StartRecordingLap(Checkpoint cp)
@@ -60,14 +64,17 @@ public class RaceMarshall : MonoBehaviour
 
     private void RecordLap(Checkpoint cp)
     {
-        if (cp.Id == this.intermediateRecords.Last().CheckpointId + 1)
-            this.intermediateRecords.Add(new LapIntermediateRecord(cp.Id, this.elapsedTime));
+        if (this.isRecordingLap)
+        {
+            if (cp.Id == this.intermediateRecords.Last().CheckpointId + 1)
+                this.intermediateRecords.Add(new LapIntermediateRecord(cp.Id, this.elapsedTime));
+        }
     }
 
     private void EndRecordingLap(Checkpoint cp)
     {
         this.isRecordingLap = false;
         this.intermediateRecords.Add(new LapIntermediateRecord(cp.Id, this.elapsedTime));
-        Debug.Log(string.Format("Lap Time = {0} ms", this.elapsedTime));
+        this.elapsedTime = 0;
     }
 }
