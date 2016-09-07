@@ -12,18 +12,18 @@ public class EasyMove : MonoBehaviour
     public Transform CenterOfMass;
     public Transform ThrusterPivot;
 
-    void Start()
+    private void Start()
     {
         GetComponent<Rigidbody>().centerOfMass = CenterOfMass.localPosition;
     }
 
-	void Update()
+    private void Update()
 	{
         this.nozzleAngle = Input.GetAxis("Horizontal");
         this.isThrustActive = Input.GetButton("Fire1");
 	}
-	
-	void FixedUpdate()
+
+    private void FixedUpdate()
 	{
 		Rigidbody rigidbody = GetComponent<Rigidbody>();
 

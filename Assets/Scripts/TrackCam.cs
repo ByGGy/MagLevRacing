@@ -3,8 +3,8 @@ using UnityEngine;
 public class TrackCam : MonoBehaviour
 {
 	public Transform Target;
-	
-	void LateUpdate()
+
+    private void LateUpdate()
 	{
 	    Vector3 offset = Target.up - Target.forward;
 
