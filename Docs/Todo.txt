@@ -7,30 +7,26 @@ a = Sum(F) / m = 15.6 m/s2
 
 //TODO
 Ship Improvement
-	Longitudinal Thruster Graphx
+	Thruster Graphx
 		Cone when activated
-		Nozzle orientation
 	
-	Longitudinal Thruster Audio
+	Thruster Audio
 		Audio sample when activated
 
 Race Marshall Improvement
 	Time Attack
-		Start position
-		Restart function
-		Restart if collision ?
+		Restart function via gamepad (Esc atm)
 		Best lap and current lap gaps
 	
-	Checkpoint Trigger Audio
-		Audio sample when activated
+	Checkpoint Audio
+		Audio sample when trigger activated
 
 Environment Improvement
-	Track
-		Improve Track flow
+	Track Graphx
+		Improve Track flow (width & turns)
 		Add tricky shortcuts
 		
 	RoadSigns
-		Fix "NoWay" signs flickering
 		Add Arrows for corners
 	
 	
