@@ -22,6 +22,8 @@ public class RaceMarshall : MonoBehaviour
     private float elapsedTime;
     private List<LapIntermediateRecord> intermediateRecords;
 
+    public Transform Ship;
+
     public float ElapsedTime { get { return this.elapsedTime; } }
     public IEnumerable<LapIntermediateRecord> IntermediateRecords { get { return this.intermediateRecords; } }
 
@@ -29,10 +31,9 @@ public class RaceMarshall : MonoBehaviour
 	{
 	    this.checkpoints = GetComponentsInChildren<Checkpoint>().OrderBy(cp => cp.Id).ToList();
         this.checkpoints.ForEach(cp => cp.OnTargetDetected += OnCheckpointTriggered);
-
-        this.isRecordingLap = false;
-        this.elapsedTime = 0;
-        this.intermediateRecords = new List<LapIntermediateRecord>();
+        
+        ResetShip();
+        ResetRecording();
 	}
 
     private void OnCheckpointTriggered(Checkpoint cp)
@@ -48,10 +49,34 @@ public class RaceMarshall : MonoBehaviour
             RecordLap(cp);
     }
 
+    private void Update()
+    {
+        if (Input.GetButton("Cancel"))
+        {
+            ResetShip();
+            ResetRecording();
+        }
+    }
+
     private void FixedUpdate()
     {
         if (this.isRecordingLap)
             this.elapsedTime += Time.fixedDeltaTime;
+    }
+
+    private void ResetShip()
+    {
+        this.Ship.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        this.Ship.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        this.Ship.position = this.transform.FindChild("StartingBlock").position;
+        this.Ship.rotation = this.transform.FindChild("StartingBlock").rotation;
+    }
+
+    private void ResetRecording()
+    {
+        this.isRecordingLap = false;
+        this.elapsedTime = 0;
+        this.intermediateRecords = new List<LapIntermediateRecord>();
     }
 
     private void StartRecordingLap(Checkpoint cp)
