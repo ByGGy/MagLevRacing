@@ -18,11 +18,13 @@ public class LapUI : MonoBehaviour
 	private void Update()
 	{
         RaceMarshall marshall = this.Source.GetComponent<RaceMarshall>();
-        
-        StringBuilder builder = new StringBuilder();
-	    builder.AppendLine(string.Format("Lap Time : {0}", FormatTime(marshall.ElapsedTime)));
-        marshall.IntermediateRecords.ToList().ForEach(r => builder.AppendLine(string.Format("   Checkpoint {0} : {1}", r.CheckpointId, FormatTime(r.ElapsedTime))));
+        if (marshall.CurrentLapRecord != null)
+        {
+            StringBuilder builder = new StringBuilder();
+	        builder.AppendLine(string.Format("Lap #{0} : {1}", marshall.CurrentLapRecord.Id +1, FormatTime(marshall.ElapsedTime)));
+            marshall.CurrentLapRecord.IntermediateRecords.ToList().ForEach(r => builder.AppendLine(string.Format("   |- Checkpoint #{0} : {1}", r.CheckpointId, FormatTime(r.ElapsedTime))));
 
-        GetComponent<Text>().text = builder.ToString();
+            GetComponent<Text>().text = builder.ToString();
+        }
 	}
 }
