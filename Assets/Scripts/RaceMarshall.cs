@@ -57,11 +57,13 @@ public class RaceMarshall : MonoBehaviour
 
     private float elapsedTime;
     private LapRecord currentLapRecord;
+    private LapRecord bestLapRecord;
 
     public Transform Ship;
 
     public float ElapsedTime { get { return this.elapsedTime; } }
     public LapRecord CurrentLapRecord { get { return this.currentLapRecord; } }
+    public LapRecord BestLapRecord { get { return this.bestLapRecord; } }
 
     private void Start()
 	{
@@ -100,6 +102,11 @@ public class RaceMarshall : MonoBehaviour
             this.currentLapRecord = new LapRecord();
 
         if (this.currentLapRecord != null)
+        {
             this.currentLapRecord.AddIntermediate(new LapIntermediateRecord(cp.Id, this.elapsedTime));
+
+            if (this.currentLapRecord.IsComplete && ((this.bestLapRecord == null) || (this.bestLapRecord.Time > this.currentLapRecord.Time)))
+                this.bestLapRecord = this.currentLapRecord;
+        }
     }
 }

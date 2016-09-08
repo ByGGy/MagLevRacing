@@ -17,14 +17,20 @@ public class LapUI : MonoBehaviour
 	// Update is called once per frame
 	private void Update()
 	{
+        StringBuilder builder = new StringBuilder();
+
         RaceMarshall marshall = this.Source.GetComponent<RaceMarshall>();
+	    if (marshall.BestLapRecord != null)
+	    {
+            builder.AppendLine(string.Format("Best Lap : #{0} - {1}", marshall.BestLapRecord.Id + 1, FormatTime(marshall.BestLapRecord.Time)));
+	    }
+
         if (marshall.CurrentLapRecord != null)
         {
-            StringBuilder builder = new StringBuilder();
 	        builder.AppendLine(string.Format("Lap #{0} : {1}", marshall.CurrentLapRecord.Id +1, FormatTime(marshall.ElapsedTime)));
             marshall.CurrentLapRecord.IntermediateRecords.ToList().ForEach(r => builder.AppendLine(string.Format("   |- Checkpoint #{0} : {1}", r.CheckpointId, FormatTime(r.ElapsedTime))));
-
-            GetComponent<Text>().text = builder.ToString();
         }
+
+        GetComponent<Text>().text = builder.ToString();
 	}
 }
