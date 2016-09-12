@@ -15,9 +15,7 @@ Ship Improvement
 
 Race Marshall Improvement
 	Time Attack
-		Keep best lap
 		Keep last 5 laps
-		Display current lap gaps with best lap
 		Display best virtual lap (sum of best intermediates) 
 	
 	Checkpoint Audio
