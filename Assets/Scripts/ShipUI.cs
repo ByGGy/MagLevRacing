@@ -6,17 +6,22 @@ public class ShipUI : MonoBehaviour
 {
     public Transform Source;
 
-    private Text shipText;
+    private Text title;
+    private Text content;
 
     private void Start()
     {
-        this.shipText = GetComponentsInChildren<Text>().Where(c => string.Equals(c.name, "ShipText")).FirstOrDefault();
+        this.title = GetComponentsInChildren<Text>().Where(c => string.Equals(c.name, "Title")).FirstOrDefault();
+        this.title.text = "Speed";
+
+        this.content = GetComponentsInChildren<Text>().Where(c => string.Equals(c.name, "Content")).FirstOrDefault();
+        this.content.text = string.Empty;
     }
 
 	// Update is called once per frame
     private void Update()
 	{
         int velocityInKmPerHour = (int)(this.Source.GetComponent<Rigidbody>().velocity.magnitude * 3600 / 1000.0f);
-        this.shipText.text = string.Format("Speed : {0}Km/h", velocityInKmPerHour);
+        this.content.text = string.Format("{0}Km/h", velocityInKmPerHour);
 	}
 }
