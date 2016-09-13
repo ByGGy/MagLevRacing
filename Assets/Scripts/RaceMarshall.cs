@@ -89,7 +89,7 @@ public class RaceMarshall : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButton("Cancel"))
+        if (Input.GetButton("Restart"))
             Reset();
     }
 

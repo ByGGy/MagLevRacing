@@ -19,8 +19,8 @@ public class EasyMove : MonoBehaviour
 
     private void Update()
 	{
-        this.nozzleAngle = Input.GetAxis("Horizontal");
-        this.isThrustActive = Input.GetButton("Fire1");
+        this.nozzleAngle = Input.GetAxis("Yaw");
+        this.isThrustActive = Input.GetButton("Accelerate");
 
         Transform nozzle = this.transform.FindChild("Nozzle");
         nozzle.transform.localRotation = Quaternion.AngleAxis(-nozzleAngle * THRUST_VECTORING_ANGLE_MAX, nozzle.transform.up);
