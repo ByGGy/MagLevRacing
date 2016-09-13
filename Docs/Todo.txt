@@ -1,17 +1,9 @@
-//TMP 
-1 N = 1 kg × m / s2
-F22 Pratt&Whitney 1 engine = 156 000 Newtons
-F 22 weight when empty ~ 20t
-Sum(F) = ma
-a = Sum(F) / m = 15.6 m/s2
-
 //TODO
+
 Ship Improvement
-	Thruster Graphx
-		Cone / Particle when activated
-	
 	Thruster Audio
 		Audio sample when activated
+
 
 Race Marshall Improvement
 	Time Attack
@@ -21,6 +13,7 @@ Race Marshall Improvement
 	Checkpoint Audio
 		Audio sample when trigger activated
 
+
 Environment Improvement
 	Track Graphx
 		Improve Track flow (width & turns)
@@ -29,7 +22,12 @@ Environment Improvement
 		
 	RoadSigns
 		Add Arrows for corners
+
+
+UI Improvement
+	Change font
 		
+
 Setup
 	Input Manager
 		Remove all unneeded axis
