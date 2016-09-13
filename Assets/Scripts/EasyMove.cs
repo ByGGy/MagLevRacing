@@ -24,6 +24,10 @@ public class EasyMove : MonoBehaviour
 
         Transform nozzle = this.transform.FindChild("Nozzle");
         nozzle.transform.localRotation = Quaternion.AngleAxis(-nozzleAngle * THRUST_VECTORING_ANGLE_MAX, nozzle.transform.up);
+
+        ParticleSystem smoke = nozzle.FindChild("Smoke").GetComponent<ParticleSystem>();
+        var doppleGangerEmission = smoke.emission;
+        doppleGangerEmission.rate = new ParticleSystem.MinMaxCurve(isThrustActive ? 400 : 0);
 	}
 
     private void FixedUpdate()
