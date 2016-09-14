@@ -94,7 +94,7 @@ public class RaceMarshall : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButton("Restart"))
+        if (Input.GetButtonDown("Restart"))
             Reset();
     }
 
