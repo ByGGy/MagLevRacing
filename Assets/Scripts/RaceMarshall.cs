@@ -57,6 +57,8 @@ public class LapRecord
 public class RaceMarshall : MonoBehaviour
 {
     private List<Checkpoint> checkpoints;
+    private AudioSource checkpointSample;
+    private AudioSource bestLapSample;
 
     private float elapsedTime;
     private LapRecord currentLapRecord;
@@ -72,6 +74,9 @@ public class RaceMarshall : MonoBehaviour
 	{
 	    this.checkpoints = GetComponentsInChildren<Checkpoint>().OrderBy(cp => cp.Id).ToList();
         this.checkpoints.ForEach(cp => cp.OnTargetDetected += OnCheckpointTriggered);
+
+        this.checkpointSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "CheckpointSample"));
+        this.bestLapSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "BestLapSample"));
 
         Reset();
 	}
@@ -107,11 +112,15 @@ public class RaceMarshall : MonoBehaviour
         if (this.currentLapRecord != null)
         {
             this.currentLapRecord.AddIntermediate(new LapIntermediateRecord(cp.Id, this.elapsedTime));
+            this.checkpointSample.Play();
 
             if (this.currentLapRecord.IsComplete)
             {
                 if ((this.bestLapRecord == null) || (this.bestLapRecord.Time > this.currentLapRecord.Time))
-                    this.bestLapRecord = this.currentLapRecord;                
+                {
+                    this.bestLapRecord = this.currentLapRecord;
+                    this.bestLapSample.Play();
+                }
             }
         }
     }
