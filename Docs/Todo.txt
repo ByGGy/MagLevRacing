@@ -1,36 +1,40 @@
-//TODO
+//TODO MUST
 
-Ship Improvement
-	Thruster Audio
-		Audio sample when activated
-
-
-Race Marshall Improvement
-	Time Attack
-		Keep last 5 laps
-		Display best virtual lap (sum of best intermediates) 
+Camera
+	Cycle between close and aerial view
 	
-	Checkpoint Audio
-		Audio sample when trigger activated
-
-
-Environment Improvement
-	Track Graphx
-		Improve Track flow (width & turns)
-		Add tricky shortcuts
-		Add alternative paths
-		
-	RoadSigns
-		Add Arrows for corners
-
-
-UI Improvement
-	Change font
-		
 
 Setup
 	Input Manager
-		Remove all unneeded axis
-		Rename axis (Turn Left / Right, Restart, Accelerate)
+		Add an input to cycle the camera view (pad & keyboard)
+
+
+Audio
+	Thruster Audio sample when activated
+	Checkpoint Audio sample when trigger activated
+	Best lap Audio sample when achieved
+	Ambient music
+	
+
+Level Design
+	Improve Track flow (width & turns)
 	
 	
+Bugfix
+	Intermediates display
+	Gap display when bestLap == currentLap
+	Nozzle smoke should inherit velocity
+	Throw exceptions in scripts Start method when a reference is not found
+	
+	
+//TODO OPTIONAL
+
+Level Design
+	Add tricky shortcuts
+	Add alternative paths
+	Add Arrows / roadsigns for corners	
+	
+
+Time Attack
+	Keep last 5 laps
+	Display best virtual lap (sum of best intermediates)
