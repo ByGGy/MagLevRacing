@@ -1,18 +1,7 @@
 //TODO MUST
 
-Camera
-	Cycle between close and aerial view
-	
-
-Setup
-	Input Manager
-		Add an input to cycle the camera view (pad & keyboard)
-
-
 Audio
-	Thruster Audio sample when activated
-	Checkpoint Audio sample when trigger activated
-	Best lap Audio sample when achieved
+	Thruster Audio sample when activated (3D)
 	Ambient music
 	
 
