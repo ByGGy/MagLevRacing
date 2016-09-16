@@ -7,6 +7,9 @@ Audio
 
 Level Design
 	Improve Track flow (width & turns)
+	Add Arrow roadsigns for corners
+	Improve DeadEnd roadsigns
+	Add more props (scale & speed)
 	
 	
 Bugfix
@@ -16,6 +19,7 @@ Bugfix
 Refactoring
 	Throw exceptions in scripts Start method when a reference is not found
 	Always reference another GO from the IDE via its transform
+	Create more prefabs from the scene (checkpoints, roadsigns...)
 
 
 //TODO OPTIONAL
@@ -23,7 +27,6 @@ Refactoring
 Level Design
 	Add tricky shortcuts
 	Add alternative paths
-	Add Arrows / roadsigns for corners	
 	
 
 Time Attack
