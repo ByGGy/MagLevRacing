@@ -26,7 +26,6 @@ public class BestLapUI : MonoBehaviour
         return string.Format("{0}{1:00}'{2:00}\"{3:000}", isNegative ? "-" : string.Empty, span.Minutes, span.Seconds, span.Milliseconds);
     }
 
-    // Update is called once per frame
     private void Update()
     {
         RaceMarshall marshall = this.Source.GetComponent<RaceMarshall>();

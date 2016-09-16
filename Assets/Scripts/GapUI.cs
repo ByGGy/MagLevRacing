@@ -33,11 +33,10 @@ public class GapUI : MonoBehaviour
         return string.Format("<color={0}>{1} {2}</color>", isNegative ? "#00ff00ff" : "#ff0000ff", isNegative ? "-" : "+", FormatTime(Math.Abs(timeInSeconds)));
     }
 
-    // Update is called once per frame
     private void Update()
     {
         RaceMarshall marshall = this.Source.GetComponent<RaceMarshall>();
-        if (marshall.BestLapRecord != null && marshall.CurrentLapRecord != null)
+        if ((marshall.BestLapRecord != null) && (marshall.CurrentLapRecord != null) && (marshall.BestLapRecord.Id != marshall.CurrentLapRecord.Id))
         {
             StringBuilder builder = new StringBuilder();
             for (int i = 1; i < marshall.CurrentLapRecord.IntermediateRecords.Count(); i++)

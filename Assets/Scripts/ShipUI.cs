@@ -18,7 +18,6 @@ public class ShipUI : MonoBehaviour
         this.content.text = string.Empty;
     }
 
-	// Update is called once per frame
     private void Update()
 	{
         int velocityInKmPerHour = (int)(this.Source.GetComponent<Rigidbody>().velocity.magnitude * 3600 / 1000.0f);

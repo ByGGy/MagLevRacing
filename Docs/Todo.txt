@@ -10,7 +10,6 @@ Level Design
 	
 	
 Bugfix
-	Gap display when bestLap == currentLap
 	Nozzle smoke should inherit velocity
 	
 	
