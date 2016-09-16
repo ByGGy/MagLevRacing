@@ -1,7 +1,6 @@
 //TODO MUST
 
 Audio
-	Thruster Audio sample when idle & activated (3D)
 	Ambient music
 	
 
@@ -14,7 +13,7 @@ Level Design
 	
 Bugfix
 	Nozzle smoke should inherit velocity
-	
+	Still a problem with gaps when bestLap == currentLap
 	
 Refactoring
 	Throw exceptions in scripts Start method when a reference is not found

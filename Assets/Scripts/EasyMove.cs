@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 public class EasyMove : MonoBehaviour
 {
@@ -9,11 +11,17 @@ public class EasyMove : MonoBehaviour
     private float nozzleAngle;
     private bool isThrustActive;
 
+    private AudioSource engineInSample;
+    private AudioSource engineOutSample;
+
     public Transform CenterOfMass;
     public Transform ThrusterPivot;
 
     private void Start()
     {
+        this.engineInSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "EngineInSample"));
+        this.engineOutSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "EngineOutSample"));
+
         GetComponent<Rigidbody>().centerOfMass = CenterOfMass.localPosition;
     }
 
@@ -27,7 +35,24 @@ public class EasyMove : MonoBehaviour
 
         ParticleSystem smoke = nozzle.FindChild("Smoke").GetComponent<ParticleSystem>();
         var doppleGangerEmission = smoke.emission;
-        doppleGangerEmission.rate = new ParticleSystem.MinMaxCurve(isThrustActive ? 400 : 0);
+        doppleGangerEmission.rate = new ParticleSystem.MinMaxCurve(isThrustActive ? 400 : 10);
+
+
+        if (this.isThrustActive)
+        {
+            this.engineInSample.volume = Mathf.Lerp(this.engineInSample.volume, 0.3f, Time.deltaTime * 2);
+            this.engineInSample.pitch = Mathf.Lerp(this.engineInSample.pitch, 1.25f, Time.deltaTime * 2);
+            this.engineOutSample.volume = Mathf.Lerp(this.engineOutSample.volume, 1.0f, Time.deltaTime * 2);
+            this.engineOutSample.pitch = Mathf.Lerp(this.engineOutSample.pitch, 1.1f, Time.deltaTime * 2);
+        }
+        else
+        {
+            this.engineInSample.volume = Mathf.Lerp(this.engineInSample.volume, 0.2f, Time.deltaTime * 3);
+            this.engineInSample.pitch = Mathf.Lerp(this.engineInSample.pitch, 0.75f, Time.deltaTime * 3);
+            this.engineOutSample.volume = Mathf.Lerp(this.engineOutSample.volume, 0.1f, Time.deltaTime * 3);
+            this.engineOutSample.pitch = Mathf.Lerp(this.engineOutSample.pitch, 0.75f, Time.deltaTime * 3);
+        }
+
 	}
 
     private void FixedUpdate()
