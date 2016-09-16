@@ -1,7 +1,7 @@
 //TODO MUST
 
 Audio
-	Thruster Audio sample when activated (3D)
+	Thruster Audio sample when idle & activated (3D)
 	Ambient music
 	
 

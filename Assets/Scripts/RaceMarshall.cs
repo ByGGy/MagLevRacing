@@ -27,18 +27,26 @@ public class LapRecord
         this.intermediateRecords = new List<LapIntermediateRecord>();
     }
 
-    public void AddIntermediate(LapIntermediateRecord record)
+    public bool TryAddIntermediate(LapIntermediateRecord record)
     {
         if (!IsComplete)
         {
             if (this.intermediateRecords.Any())
             {
                 if ((record.CheckpointId == this.intermediateRecords.Last().CheckpointId + 1) || (record.CheckpointId == this.intermediateRecords.First().CheckpointId))
+                {
                     this.intermediateRecords.Add(record);
+                    return true;
+                }
             }
             else
+            {
                 this.intermediateRecords.Add(record);
+                return true;
+            }
         }
+
+        return false;
     }
 
     public bool IsComplete
@@ -111,8 +119,8 @@ public class RaceMarshall : MonoBehaviour
 
         if (this.currentLapRecord != null)
         {
-            this.currentLapRecord.AddIntermediate(new LapIntermediateRecord(cp.Id, this.elapsedTime));
-            this.checkpointSample.Play();
+            if (this.currentLapRecord.TryAddIntermediate(new LapIntermediateRecord(cp.Id, this.elapsedTime)))
+                this.checkpointSample.Play();
 
             if (this.currentLapRecord.IsComplete)
             {
