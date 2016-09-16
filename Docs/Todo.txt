@@ -10,12 +10,15 @@ Level Design
 	
 	
 Bugfix
-	Intermediates display
 	Gap display when bestLap == currentLap
 	Nozzle smoke should inherit velocity
+	
+	
+Refactoring
 	Throw exceptions in scripts Start method when a reference is not found
-	
-	
+	Always reference another GO from the IDE via its transform
+
+
 //TODO OPTIONAL
 
 Level Design

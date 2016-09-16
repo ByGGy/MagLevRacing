@@ -40,7 +40,7 @@ public class GapUI : MonoBehaviour
         if (marshall.BestLapRecord != null && marshall.CurrentLapRecord != null)
         {
             StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < marshall.CurrentLapRecord.IntermediateRecords.Count(); i++)
+            for (int i = 1; i < marshall.CurrentLapRecord.IntermediateRecords.Count(); i++)
             {
                 builder.AppendLine(FormatGap(marshall.CurrentLapRecord.IntermediateRecords.ElementAt(i).ElapsedTime - marshall.BestLapRecord.IntermediateRecords.ElementAt(i).ElapsedTime));
             }

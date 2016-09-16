@@ -36,7 +36,7 @@ public class CurrentLapUI : MonoBehaviour
             this.title.text = string.Format("Current lap #{0}. {1}", marshall.CurrentLapRecord.Id + 1, FormatTime(marshall.ElapsedTime));
 
             StringBuilder builder = new StringBuilder();
-            marshall.CurrentLapRecord.IntermediateRecords.ToList().ForEach(r => builder.AppendLine(string.Format("{0}. {1}", r.CheckpointId, FormatTime(r.ElapsedTime))));
+            marshall.CurrentLapRecord.IntermediateRecords.Skip(1).Select((r , i) => string.Format("{0}. {1}", i+1, FormatTime(r.ElapsedTime))).ToList().ForEach(info => builder.AppendLine(info));
             this.content.text = builder.ToString();
         }
     }
