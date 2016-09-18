@@ -1,13 +1,7 @@
 //TODO MUST
 
-Audio
-	Ambient music
-	
-
 Level Design
 	Improve Track flow (width & turns)
-	Add Arrow roadsigns for corners
-	Improve DeadEnd roadsigns
 	Add more props (scale & speed)
 	
 	
