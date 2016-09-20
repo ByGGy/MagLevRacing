@@ -29,7 +29,7 @@ public class BestLapUI : MonoBehaviour
     private void Update()
     {
         RaceMarshall marshall = this.Source.GetComponent<RaceMarshall>();
-        if (marshall.BestLapRecord != null)
-            this.content.text= string.Format(FormatTime(marshall.BestLapRecord.Time));
+        if (marshall.BestLap != null)
+            this.content.text= string.Format(FormatTime(marshall.BestLap.Time));
     }
 }

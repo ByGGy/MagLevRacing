@@ -30,12 +30,12 @@ public class CurrentLapUI : MonoBehaviour
     private void Update()
     {
         RaceMarshall marshall = this.Source.GetComponent<RaceMarshall>();
-        if (marshall.CurrentLapRecord != null)
+        if (marshall.CurrentAttempt != null)
         {
-            this.title.text = string.Format("Current lap #{0}. {1}", marshall.CurrentLapRecord.Id + 1, FormatTime(marshall.ElapsedTime));
+            this.title.text = string.Format("Current lap #{0}. {1}", marshall.CurrentAttempt.CurrentLap.Id + 1, FormatTime(marshall.CurrentAttempt.ElapsedTime));
 
             StringBuilder builder = new StringBuilder();
-            marshall.CurrentLapRecord.IntermediateRecords.Skip(1).Select((r , i) => string.Format("{0}. {1}", i+1, FormatTime(r.ElapsedTime))).ToList().ForEach(info => builder.AppendLine(info));
+            marshall.CurrentAttempt.CurrentLap.Intermediates.Skip(1).Select((r , i) => string.Format("{0}. {1}", i+1, FormatTime(r.ElapsedTime))).ToList().ForEach(info => builder.AppendLine(info));
             this.content.text = builder.ToString();
         }
     }

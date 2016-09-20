@@ -19,47 +19,91 @@ public class LapRecord
     private static uint Qty = 0;
 
     public readonly uint Id;
-    private readonly List<LapIntermediateRecord> intermediateRecords;
+    private readonly List<LapIntermediateRecord> intermediates;
 
     public LapRecord()
     {
         this.Id = ++Qty;
-        this.intermediateRecords = new List<LapIntermediateRecord>();
+        this.intermediates = new List<LapIntermediateRecord>();
     }
+
+    public bool IsComplete
+    {
+        get { return (this.intermediates.Count() > 1) && (this.intermediates.First().CheckpointId == this.intermediates.Last().CheckpointId); }
+    }
+
+    public float Time
+    {
+        get { return this.intermediates.Any() ? this.intermediates.Last().ElapsedTime : 0; }
+    }
+
+    public IEnumerable<LapIntermediateRecord> Intermediates { get { return this.intermediates; } }
 
     public bool TryAddIntermediate(LapIntermediateRecord record)
     {
         if (!IsComplete)
         {
-            if (this.intermediateRecords.Any())
+            if (this.intermediates.Any())
             {
-                if ((record.CheckpointId == this.intermediateRecords.Last().CheckpointId + 1) || (record.CheckpointId == this.intermediateRecords.First().CheckpointId))
+                if ((record.CheckpointId == this.intermediates.Last().CheckpointId + 1) || (record.CheckpointId == this.intermediates.First().CheckpointId))
                 {
-                    this.intermediateRecords.Add(record);
+                    this.intermediates.Add(record);
                     return true;
                 }
             }
             else
             {
-                this.intermediateRecords.Add(record);
+                this.intermediates.Add(record);
                 return true;
             }
         }
 
         return false;
     }
+}
 
-    public bool IsComplete
+public class TimeAttackAttempt
+{
+    private readonly LapRecord referenceLap;
+    private readonly LapRecord currentLap;
+    private float elapsedTime;
+
+    public TimeAttackAttempt(LapRecord referenceLap)
     {
-        get { return (this.intermediateRecords.Count() > 1) && (this.intermediateRecords.First().CheckpointId == this.intermediateRecords.Last().CheckpointId); }
+        this.referenceLap = referenceLap;
+        this.currentLap = new LapRecord();
+        this.elapsedTime = 0;
     }
 
-    public float Time
+    public bool IsComplete { get { return this.currentLap.IsComplete; } }
+
+    public float ElapsedTime { get { return this.elapsedTime; } }
+    public float Time { get { return this.currentLap.Time; } }
+
+    public LapRecord CurrentLap { get { return this.currentLap; } }
+
+    public IEnumerable<float> Gaps
     {
-        get { return this.intermediateRecords.Any() ? this.intermediateRecords.Last().ElapsedTime : 0; }
+        get
+        {
+            List<float> values = new List<float>();
+            for (int i = 0; i < this.currentLap.Intermediates.Count(); i++)
+            {
+                values.Add(this.currentLap.Intermediates.ElementAt(i).ElapsedTime - this.referenceLap.Intermediates.ElementAt(i).ElapsedTime);
+            }
+            return values;
+        }
     }
 
-    public IEnumerable<LapIntermediateRecord> IntermediateRecords { get { return this.intermediateRecords; } }
+    public void UpdateClock(float deltaTime)
+    {
+        this.elapsedTime += deltaTime;
+    }
+
+    public bool TryAddIntermediate(Checkpoint cp)
+    {
+        return this.currentLap.TryAddIntermediate(new LapIntermediateRecord(cp.Id, this.elapsedTime));
+    }
 }
 
 public class RaceMarshall : MonoBehaviour
@@ -68,15 +112,13 @@ public class RaceMarshall : MonoBehaviour
     private AudioSource checkpointSample;
     private AudioSource bestLapSample;
 
-    private float elapsedTime;
-    private LapRecord currentLapRecord;
-    private LapRecord bestLapRecord;
+    private TimeAttackAttempt currentAttempt;
+    private LapRecord bestLap;
 
     public Transform Ship;
 
-    public float ElapsedTime { get { return this.elapsedTime; } }
-    public LapRecord CurrentLapRecord { get { return this.currentLapRecord; } }
-    public LapRecord BestLapRecord { get { return this.bestLapRecord; } }
+    public TimeAttackAttempt CurrentAttempt { get { return this.currentAttempt; } }
+    public LapRecord BestLap { get { return this.bestLap; } }
 
     private void Start()
 	{
@@ -86,13 +128,12 @@ public class RaceMarshall : MonoBehaviour
         this.checkpointSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "CheckpointSample"));
         this.bestLapSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "BestLapSample"));
 
-        Reset();
+        Restart();
 	}
 
-    private void Reset()
+    private void Restart()
     {
-        this.elapsedTime = 0;
-        this.currentLapRecord = null;
+        this.currentAttempt = null;
 
         this.Ship.GetComponent<Rigidbody>().velocity = Vector3.zero;
         this.Ship.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
@@ -103,30 +144,30 @@ public class RaceMarshall : MonoBehaviour
     private void Update()
     {
         if (Input.GetButtonDown("Restart"))
-            Reset();
+            Restart();
     }
 
     private void FixedUpdate()
     {
-        if ((this.currentLapRecord != null) && !this.currentLapRecord.IsComplete)
-            this.elapsedTime += Time.fixedDeltaTime;
+        if ((this.currentAttempt != null) && !this.currentAttempt.IsComplete)
+            this.currentAttempt.UpdateClock(Time.fixedDeltaTime);
     }
 
     private void OnCheckpointTriggered(Checkpoint cp)
     {
-        if ((cp.Id == this.checkpoints.First().Id) && (this.currentLapRecord == null))
-            this.currentLapRecord = new LapRecord();
+        if ((cp.Id == this.checkpoints.First().Id) && (this.currentAttempt == null))
+            this.currentAttempt = new TimeAttackAttempt(this.bestLap);
 
-        if (this.currentLapRecord != null)
+        if (this.currentAttempt != null)
         {
-            if (this.currentLapRecord.TryAddIntermediate(new LapIntermediateRecord(cp.Id, this.elapsedTime)))
+            if (this.currentAttempt.TryAddIntermediate(cp))
                 this.checkpointSample.Play();
 
-            if (this.currentLapRecord.IsComplete)
+            if (this.currentAttempt.IsComplete)
             {
-                if ((this.bestLapRecord == null) || (this.bestLapRecord.Time > this.currentLapRecord.Time))
+                if ((this.bestLap == null) || (this.bestLap.Time > this.currentAttempt.Time))
                 {
-                    this.bestLapRecord = this.currentLapRecord;
+                    this.bestLap = this.currentAttempt.CurrentLap;
                     this.bestLapSample.Play();
                 }
             }

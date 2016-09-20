@@ -36,14 +36,10 @@ public class GapUI : MonoBehaviour
     private void Update()
     {
         RaceMarshall marshall = this.Source.GetComponent<RaceMarshall>();
-        if ((marshall.BestLapRecord != null) && (marshall.CurrentLapRecord != null) && (marshall.BestLapRecord.Id != marshall.CurrentLapRecord.Id))
+        if (marshall.CurrentAttempt != null)
         {
             StringBuilder builder = new StringBuilder();
-            for (int i = 1; i < marshall.CurrentLapRecord.IntermediateRecords.Count(); i++)
-            {
-                builder.AppendLine(FormatGap(marshall.CurrentLapRecord.IntermediateRecords.ElementAt(i).ElapsedTime - marshall.BestLapRecord.IntermediateRecords.ElementAt(i).ElapsedTime));
-            }
-
+            marshall.CurrentAttempt.Gaps.Skip(1).Select(g => FormatGap(g)).ToList().ForEach(info => builder.AppendLine(info));
             this.content.text = builder.ToString();
         }
     }
