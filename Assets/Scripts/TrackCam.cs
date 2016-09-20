@@ -34,6 +34,7 @@ public class TrackCam : MonoBehaviour
         if (this.isAerial)
             transform.position += Target.up * 150;
 
-		transform.LookAt(Target);
+		transform.LookAt(Target.position + Target.up, Vector3.up);
+        GetComponent<Camera>().fieldOfView = 60 + velocity * 0.25f;
 	}
 }

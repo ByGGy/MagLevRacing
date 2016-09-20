@@ -8,6 +8,7 @@ Level Design
 Bugfix
 	Lap complete when crossing the starting line twice in a few seconds..
 	Nozzle smoke should inherit velocity
+	Arrows emission value should have an impact on GI
 	
 	
 Refactoring
