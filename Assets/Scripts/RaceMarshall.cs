@@ -87,10 +87,13 @@ public class TimeAttackAttempt
         get
         {
             List<float> values = new List<float>();
-            for (int i = 0; i < this.currentLap.Intermediates.Count(); i++)
+
+            if (this.referenceLap != null)
             {
-                values.Add(this.currentLap.Intermediates.ElementAt(i).ElapsedTime - this.referenceLap.Intermediates.ElementAt(i).ElapsedTime);
+                for (int i = 0; i < this.currentLap.Intermediates.Count(); i++)
+                    values.Add(this.currentLap.Intermediates.ElementAt(i).ElapsedTime - this.referenceLap.Intermediates.ElementAt(i).ElapsedTime);
             }
+
             return values;
         }
     }
