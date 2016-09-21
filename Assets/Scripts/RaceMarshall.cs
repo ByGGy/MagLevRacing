@@ -16,14 +16,17 @@ public class LapIntermediateRecord
 
 public class LapRecord
 {
-    private static uint Qty = 0;
+    private static uint NextId = 0;
 
     public readonly uint Id;
+
+    private readonly int checkpointQty;
     private readonly List<LapIntermediateRecord> intermediates;
 
-    public LapRecord()
+    public LapRecord(int checkpointQty)
     {
-        this.Id = ++Qty;
+        this.Id = ++NextId;
+        this.checkpointQty = checkpointQty;
         this.intermediates = new List<LapIntermediateRecord>();
     }
 
@@ -45,7 +48,8 @@ public class LapRecord
         {
             if (this.intermediates.Any())
             {
-                if ((record.CheckpointId == this.intermediates.Last().CheckpointId + 1) || (record.CheckpointId == this.intermediates.First().CheckpointId))
+                if ((record.CheckpointId == this.intermediates.Last().CheckpointId + 1)
+                    || ((record.CheckpointId == this.intermediates.First().CheckpointId) && (this.intermediates.Count() == this.checkpointQty)))
                 {
                     this.intermediates.Add(record);
                     return true;
@@ -68,10 +72,10 @@ public class TimeAttackAttempt
     private readonly LapRecord currentLap;
     private float elapsedTime;
 
-    public TimeAttackAttempt(LapRecord referenceLap)
+    public TimeAttackAttempt(int checkpointQty, LapRecord referenceLap)
     {
         this.referenceLap = referenceLap;
-        this.currentLap = new LapRecord();
+        this.currentLap = new LapRecord(checkpointQty);
         this.elapsedTime = 0;
     }
 
@@ -159,7 +163,7 @@ public class RaceMarshall : MonoBehaviour
     private void OnCheckpointTriggered(Checkpoint cp)
     {
         if ((cp.Id == this.checkpoints.First().Id) && (this.currentAttempt == null))
-            this.currentAttempt = new TimeAttackAttempt(this.bestLap);
+            this.currentAttempt = new TimeAttackAttempt(this.checkpoints.Count(), this.bestLap);
 
         if (this.currentAttempt != null)
         {
