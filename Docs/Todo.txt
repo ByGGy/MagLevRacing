@@ -2,9 +2,15 @@
 
 Level Design
 	Improve Track flow (width & turns)
-	Add more props (scale & speed)
+	Add one or two alternate paths
 	
-	
+//TODO OPTIONAL
+
+Time Attack
+	Keep last 5 laps
+	Display best virtual lap (sum of best intermediates)
+
+
 Bugfix
 	Nozzle smoke should inherit velocity
 	Arrows emission value should have an impact on GI
@@ -13,16 +19,4 @@ Bugfix
 Refactoring
 	Throw exceptions in scripts Start method when a reference is not found
 	Always reference another GO from the IDE via its transform
-	Create more prefabs from the scene (checkpoints, roadsigns...)
-
-
-//TODO OPTIONAL
-
-Level Design
-	Add tricky shortcuts
-	Add alternative paths
-	
-
-Time Attack
-	Keep last 5 laps
-	Display best virtual lap (sum of best intermediates)
+	Transfer this into GitHub Issue system

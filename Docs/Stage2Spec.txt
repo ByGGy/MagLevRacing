@@ -1,0 +1,35 @@
+GraphX
+	Check Blender to Unity workflow
+	Blender scene (ship, buildings, roadsigns, ramps, loops, props)
+	Add common props for scale
+	Low Poly without texturing
+	one bevel + one smooth group + face weighted normal
+	Ambient occlusion
+
+
+PhysX
+	Remove PhysX DoF constraints on ship (allow Y translation, X & Z rotations)
+	Apply gravity force 
+	Apply magnetic force (several raycasting samples, cf droneMock)
+	Use Collision meshes (~GraphX mesh without bevels)
+
+
+Level Design
+	Check RealtimeCSG workflow
+	Add tricks (ramp / loop / slope / gate blocks)
+	Add shortcuts
+	Add alternate paths
+	
+
+Control
+	Analogic thruster ?
+
+
+HUD
+	Improve readability but keep minimalist theme
+
+
+Audio
+	Improve ambient music (more phrases)
+	Improve best lap sample
+	2 samples for checkpoints (good & bad..and shorter, like 2 chords)
