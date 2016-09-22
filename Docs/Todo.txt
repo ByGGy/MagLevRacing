@@ -1,8 +1,5 @@
 //TODO MUST
 
-Level Design
-	Improve Track flow (width & turns)
-	Add one or two alternate paths
 	
 //TODO OPTIONAL
 
@@ -10,6 +7,10 @@ Time Attack
 	Keep last 5 laps
 	Display best virtual lap (sum of best intermediates)
 
+
+Level Design
+	Add one or two alternate paths
+	
 
 Bugfix
 	Nozzle smoke should inherit velocity

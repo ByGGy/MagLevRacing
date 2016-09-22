@@ -29,7 +29,7 @@ public class TrackCam : MonoBehaviour
             offset -= Target.forward;
 
         offset.Normalize();
-        transform.position = Target.position + offset * Mathf.Max(15, Target.GetComponent<Rigidbody>().velocity.magnitude * 0.3f);
+        transform.position = Target.position + offset * Mathf.Max(15, Target.GetComponent<Rigidbody>().velocity.magnitude * 0.25f);
 
         if (this.isAerial)
             transform.position += Target.up * 150;
