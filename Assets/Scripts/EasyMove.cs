@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class EasyMove : MonoBehaviour
 {
+    private const float MAGLEV_RADIUS = 5.0f;
+    private const int MAGLEV_SAMPLES = 12;
+
     private const float TORQUE_MAX = 180000; //Newtons
     private const float THRUST_MAX = 180000; //Newtons
     private const float THRUST_VECTORING_ANGLE_MAX = 30;  //°
@@ -58,6 +61,24 @@ public class EasyMove : MonoBehaviour
 	{
 		Rigidbody rigidbody = GetComponent<Rigidbody>();
 
+        //MagLev
+        float maxMagnitude = GetComponent<Rigidbody>().mass * 9.81f;
+        Vector3 magLevForcePerSample = this.transform.up * maxMagnitude;
+
+        for (int i = 0; i < MAGLEV_SAMPLES; i++)
+        {
+            RaycastHit hit;
+            float offset = i * 2 * Mathf.PI / MAGLEV_SAMPLES;
+            Vector3 samplePosition = this.CenterOfMass.position + MAGLEV_RADIUS * Mathf.Cos(offset) * this.transform.forward + MAGLEV_RADIUS * Mathf.Sin(offset) * this.transform.right;
+            if (Physics.Raycast(samplePosition, -this.transform.up, out hit, 10))
+            {
+                float cosine = Vector3.Dot(hit.normal, this.transform.up);
+                if (cosine > 0)
+                    rigidbody.AddForceAtPosition((magLevForcePerSample * cosine * cosine) / Mathf.Exp(hit.distance), samplePosition);
+            }
+        }
+
+        //Thruster
         rigidbody.AddRelativeTorque(Vector3.up * nozzleAngle * TORQUE_MAX);
 
 	    if (isThrustActive)
@@ -66,5 +87,30 @@ public class EasyMove : MonoBehaviour
             Vector3 thrust = thrustAngle * rigidbody.transform.forward * THRUST_MAX;
             rigidbody.AddForceAtPosition(thrust, ThrusterPivot.position);
 	    }
+
+        //Gravity
+        //Vector3 gravity = Vector3.down * GetComponent<Rigidbody>().mass * 9.81f;
+        //rigidbody.AddForceAtPosition(gravity, this.CenterOfMass.position);
 	}
+
+    private void LateUpdate()
+    {
+        float maxMagnitude = GetComponent<Rigidbody>().mass * 9.81f;
+        Vector3 magLevForcePerSample = this.transform.up * maxMagnitude;
+
+        for (int i = 0; i < MAGLEV_SAMPLES; i++)
+        {
+            RaycastHit hit;
+            float offset = i * 2 * Mathf.PI / MAGLEV_SAMPLES;
+            Vector3 samplePosition = this.CenterOfMass.position + MAGLEV_RADIUS * Mathf.Cos(offset) * this.transform.forward + MAGLEV_RADIUS * Mathf.Sin(offset) * this.transform.right;
+            if (Physics.Raycast(samplePosition, -this.transform.up, out hit, 10))
+            {
+                float cosine = Vector3.Dot(hit.normal, this.transform.up);
+                if (cosine > 0)
+                {
+                    Debug.DrawRay(samplePosition, (magLevForcePerSample * cosine * cosine) / Mathf.Exp(hit.distance) / 500, Color.green, 0, false);
+                }
+            }
+        }        
+    }
 }
