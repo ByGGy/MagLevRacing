@@ -3,8 +3,14 @@ using UnityEngine;
 
 public class EasyMove : MonoBehaviour
 {
+    private const float PHYSX_CONTROL_DRAG = 0.3f;
+    private const float PHYSX_CONTROL_ANGULARDRAG = 2f;
+
+    private const float PHYSX_FREEFALL_DRAG = 0.001f;
+    private const float PHYSX_FREEFALL_ANGULARDRAG = 0.001f;
+
     private const float MAGLEV_RADIUS = 5.0f;
-    private const int MAGLEV_SAMPLES = 12;
+    private const int MAGLEV_SAMPLES = 8;
 
     private const float TORQUE_MAX = 180000; //Newtons
     private const float THRUST_MAX = 180000; //Newtons
@@ -25,6 +31,8 @@ public class EasyMove : MonoBehaviour
         this.engineOutSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "EngineOutSample"));
 
         GetComponent<Rigidbody>().centerOfMass = CenterOfMass.localPosition;
+        GetComponent<Rigidbody>().drag = PHYSX_FREEFALL_DRAG;
+        GetComponent<Rigidbody>().angularDrag = PHYSX_FREEFALL_ANGULARDRAG;
     }
 
     private void Update()
@@ -38,7 +46,6 @@ public class EasyMove : MonoBehaviour
         ParticleSystem smoke = nozzle.FindChild("Smoke").GetComponent<ParticleSystem>();
         var doppleGangerEmission = smoke.emission;
         doppleGangerEmission.rate = new ParticleSystem.MinMaxCurve(isThrustActive ? 400 : 10);
-
 
         if (this.isThrustActive)
         {
@@ -54,7 +61,6 @@ public class EasyMove : MonoBehaviour
             this.engineOutSample.volume = Mathf.Lerp(this.engineOutSample.volume, 0.1f, Time.deltaTime * 3);
             this.engineOutSample.pitch = Mathf.Lerp(this.engineOutSample.pitch, 0.75f, Time.deltaTime * 3);
         }
-
 	}
 
     private void FixedUpdate()
@@ -63,20 +69,31 @@ public class EasyMove : MonoBehaviour
 
         //MagLev
         float maxMagnitude = GetComponent<Rigidbody>().mass * 9.81f;
-        Vector3 magLevForcePerSample = this.transform.up * maxMagnitude;
 
+        int sampleCount = 0;
         for (int i = 0; i < MAGLEV_SAMPLES; i++)
         {
             RaycastHit hit;
             float offset = i * 2 * Mathf.PI / MAGLEV_SAMPLES;
             Vector3 samplePosition = this.CenterOfMass.position + MAGLEV_RADIUS * Mathf.Cos(offset) * this.transform.forward + MAGLEV_RADIUS * Mathf.Sin(offset) * this.transform.right;
-            if (Physics.Raycast(samplePosition, -this.transform.up, out hit, 10))
+            Vector3 direction = -this.transform.up;// + Quaternion.AngleAxis(i * 2 * 180.0f / MAGLEV_SAMPLES, this.transform.up) * this.transform.forward;
+            direction.Normalize();
+            if (Physics.Raycast(samplePosition, direction, out hit, 6))
             {
-                float cosine = Vector3.Dot(hit.normal, this.transform.up);
-                if (cosine > 0)
-                    rigidbody.AddForceAtPosition((magLevForcePerSample * cosine * cosine) / Mathf.Exp(hit.distance), samplePosition);
+                float cosine = Vector3.Dot(hit.normal, -direction);
+                if (cosine > 0.25f)
+                {
+                    //float efficiency = cosine * cosine / Mathf.Exp(hit.distance);
+                    float efficiency = 1 / Mathf.Exp(hit.distance);
+                    rigidbody.AddForceAtPosition(-direction * maxMagnitude * efficiency, samplePosition);
+                    sampleCount++;
+                }
             }
         }
+
+        //Drag
+        GetComponent<Rigidbody>().drag = sampleCount == 0 ? PHYSX_FREEFALL_DRAG : PHYSX_CONTROL_DRAG;
+        GetComponent<Rigidbody>().angularDrag = sampleCount == 0 ? PHYSX_FREEFALL_ANGULARDRAG : PHYSX_CONTROL_ANGULARDRAG;
 
         //Thruster
         rigidbody.AddRelativeTorque(Vector3.up * nozzleAngle * TORQUE_MAX);
@@ -87,30 +104,29 @@ public class EasyMove : MonoBehaviour
             Vector3 thrust = thrustAngle * rigidbody.transform.forward * THRUST_MAX;
             rigidbody.AddForceAtPosition(thrust, ThrusterPivot.position);
 	    }
-
-        //Gravity
-        //Vector3 gravity = Vector3.down * GetComponent<Rigidbody>().mass * 9.81f;
-        //rigidbody.AddForceAtPosition(gravity, this.CenterOfMass.position);
 	}
 
     private void LateUpdate()
     {
         float maxMagnitude = GetComponent<Rigidbody>().mass * 9.81f;
-        Vector3 magLevForcePerSample = this.transform.up * maxMagnitude;
 
         for (int i = 0; i < MAGLEV_SAMPLES; i++)
         {
             RaycastHit hit;
             float offset = i * 2 * Mathf.PI / MAGLEV_SAMPLES;
             Vector3 samplePosition = this.CenterOfMass.position + MAGLEV_RADIUS * Mathf.Cos(offset) * this.transform.forward + MAGLEV_RADIUS * Mathf.Sin(offset) * this.transform.right;
-            if (Physics.Raycast(samplePosition, -this.transform.up, out hit, 10))
+            Vector3 direction = -this.transform.up;// + Quaternion.AngleAxis(i * 2 * 180.0f / MAGLEV_SAMPLES, this.transform.up) * this.transform.forward;
+            direction.Normalize();
+            if (Physics.Raycast(samplePosition, direction, out hit, 6))
             {
-                float cosine = Vector3.Dot(hit.normal, this.transform.up);
-                if (cosine > 0)
+                float cosine = Vector3.Dot(hit.normal, -direction);
+                if (cosine > 0.25f)
                 {
-                    Debug.DrawRay(samplePosition, (magLevForcePerSample * cosine * cosine) / Mathf.Exp(hit.distance) / 500, Color.green, 0, false);
+                    //float efficiency = cosine * cosine / Mathf.Exp(hit.distance);
+                    float efficiency = 1 / Mathf.Exp(hit.distance);
+                    Debug.DrawRay(samplePosition, -direction * maxMagnitude * efficiency / 500, Color.cyan, 0, false);
                 }
             }
-        }        
+        }
     }
 }
