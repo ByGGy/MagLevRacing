@@ -98,6 +98,9 @@ public class EasyMove : MonoBehaviour
 
         //Drag
         bool isFreeFall = sampleCount < MAGLEV_SAMPLES * 0.5f;
+//        float angle = Vector3.Angle(this.transform.forward, GetComponent<Rigidbody>().velocity);
+//        GetComponent<Rigidbody>().drag = PHYSX_CONTROL_DRAG * angle / 180.0f;
+//        GetComponent<Rigidbody>().angularDrag = PHYSX_CONTROL_ANGULARDRAG * angle / 180.0f;
         GetComponent<Rigidbody>().drag = isFreeFall ? PHYSX_FREEFALL_DRAG : PHYSX_CONTROL_DRAG;
         GetComponent<Rigidbody>().angularDrag = isFreeFall ? PHYSX_FREEFALL_ANGULARDRAG : PHYSX_CONTROL_ANGULARDRAG;
 
