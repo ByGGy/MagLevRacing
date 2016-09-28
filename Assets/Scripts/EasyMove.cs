@@ -1,5 +1,41 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+
+public class MagLevSample
+{
+    public readonly Vector3 Position;
+    public readonly Vector3 Direction;
+    public readonly float Weight;
+
+    public static List<MagLevSample> Generate(int qty, Vector3 center, float radius, Vector3 forward, Vector3 right, Vector3 up, Vector3 velocity)
+    {
+        Vector3 sampleDirection = forward;
+        Quaternion sampleOffset = Quaternion.AngleAxis(360.0f / qty, up);
+
+        return Enumerable.Range(0, qty).Select(index => 
+        {
+            Vector3 position = center + sampleDirection * radius;
+
+            //Terminal velocity estimated at 110 m/s
+            float weightConstantPart = 1 - velocity.magnitude / 110;
+            float weightDynamicPart = 1 - weightConstantPart;
+
+            Vector3 vProjected = velocity - Vector3.Project(velocity, up);
+            float factor = 1 - Vector3.Angle(sampleDirection, vProjected) / 180.0f;
+
+            sampleDirection = sampleOffset * sampleDirection;
+            return new MagLevSample(position, -up, weightConstantPart + weightDynamicPart * factor);
+        }).ToList();
+    }
+
+    public MagLevSample(Vector3 position, Vector3 direction, float weight)
+    {
+        this.Position = position;
+        this.Direction = direction;
+        this.Weight = weight;
+    }
+}
 
 public class EasyMove : MonoBehaviour
 {
@@ -11,7 +47,7 @@ public class EasyMove : MonoBehaviour
 
     private const float MAGLEV_MAXHEIGHT = 4f;
     private const float MAGLEV_RADIUS = 6.0f;
-    private const int MAGLEV_SAMPLES = 8;
+    private const int MAGLEV_SAMPLE_QTY = 8;
 
     private const float TORQUE_MAX = 180000; //Newtons
     private const float THRUST_MAX = 180000; //Newtons
@@ -32,8 +68,8 @@ public class EasyMove : MonoBehaviour
         this.engineOutSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "EngineOutSample"));
 
         GetComponent<Rigidbody>().centerOfMass = CenterOfMass.localPosition;
-        GetComponent<Rigidbody>().drag = PHYSX_FREEFALL_DRAG;
-        GetComponent<Rigidbody>().angularDrag = PHYSX_FREEFALL_ANGULARDRAG;
+        GetComponent<Rigidbody>().drag = PHYSX_CONTROL_DRAG;
+        GetComponent<Rigidbody>().angularDrag = PHYSX_CONTROL_ANGULARDRAG;
     }
 
     private void Update()
@@ -69,13 +105,32 @@ public class EasyMove : MonoBehaviour
 		Rigidbody rigidbody = GetComponent<Rigidbody>();
 
         //MagLev
-        float maxMagnitudePerSample = GetComponent<Rigidbody>().mass * 9.81f / MAGLEV_SAMPLES;
+        float maxMagnitudePerSample = rigidbody.mass * 9.81f / MAGLEV_SAMPLE_QTY;
 
-        int sampleCount = 0;
-        for (int i = 0; i < MAGLEV_SAMPLES; i++)
+        List<MagLevSample> samples = MagLevSample.Generate(MAGLEV_SAMPLE_QTY, this.CenterOfMass.position, MAGLEV_RADIUS, this.transform.forward, this.transform.right, this.transform.up, rigidbody.velocity);
+
+        int hitQty = 0;
+        samples.ForEach(s =>
+        {
+            Debug.DrawRay(this.CenterOfMass.position, (s.Position - this.CenterOfMass.position).normalized * s.Weight * 5, Color.green, 0, false);
+
+            RaycastHit hit;
+            if (Physics.Raycast(s.Position, s.Direction, out hit, MAGLEV_MAXHEIGHT))
+            {
+                float efficiency = Mathf.Exp(MAGLEV_MAXHEIGHT * 0.5f) / Mathf.Exp(hit.distance);
+                rigidbody.AddForceAtPosition(hit.normal * maxMagnitudePerSample * efficiency * s.Weight, s.Position);
+
+                Debug.DrawRay(s.Position, hit.normal * efficiency * 5, Color.cyan, 0, false);
+
+                hitQty++;
+            }
+        });
+
+        /*
+        for (int i = 0; i < MAGLEV_SAMPLE_QTY; i++)
         {
             RaycastHit hit;
-            float offset = i * 2 * Mathf.PI / MAGLEV_SAMPLES;
+            float offset = i * 2 * Mathf.PI / MAGLEV_SAMPLE_QTY;
             Vector3 samplePosition = this.CenterOfMass.position + MAGLEV_RADIUS * Mathf.Cos(offset) * this.transform.forward + MAGLEV_RADIUS * Mathf.Sin(offset) * this.transform.right;
             Vector3 magLevForceDirection = this.transform.up.normalized;
             if (Physics.Raycast(samplePosition, -magLevForceDirection, out hit, MAGLEV_MAXHEIGHT))
@@ -91,22 +146,23 @@ public class EasyMove : MonoBehaviour
                     float efficiency = Mathf.Exp(MAGLEV_MAXHEIGHT * 0.5f) / Mathf.Exp(hit.distance);
                     rigidbody.AddForceAtPosition(hit.normal * maxMagnitudePerSample * efficiency * antiImpact, samplePosition);
                     Debug.DrawRay(samplePosition, hit.normal * maxMagnitudePerSample * efficiency * antiImpact / 500, Color.cyan, 0, false);
-                    sampleCount++;
+                    hitQty++;
                 }
             }
-        }
+        }*/
 
         //Drag
-        bool isFreeFall = sampleCount < MAGLEV_SAMPLES * 0.5f;
+//        bool isFreeFall = hitQty < MAGLEV_SAMPLE_QTY * 0.5f;
 //        float angle = Vector3.Angle(this.transform.forward, GetComponent<Rigidbody>().velocity);
 //        GetComponent<Rigidbody>().drag = PHYSX_CONTROL_DRAG * angle / 180.0f;
 //        GetComponent<Rigidbody>().angularDrag = PHYSX_CONTROL_ANGULARDRAG * angle / 180.0f;
-        GetComponent<Rigidbody>().drag = isFreeFall ? PHYSX_FREEFALL_DRAG : PHYSX_CONTROL_DRAG;
-        GetComponent<Rigidbody>().angularDrag = isFreeFall ? PHYSX_FREEFALL_ANGULARDRAG : PHYSX_CONTROL_ANGULARDRAG;
+//        GetComponent<Rigidbody>().drag = isFreeFall ? PHYSX_FREEFALL_DRAG : PHYSX_CONTROL_DRAG;
+//        GetComponent<Rigidbody>().angularDrag = isFreeFall ? PHYSX_FREEFALL_ANGULARDRAG : PHYSX_CONTROL_ANGULARDRAG;
 
-        //Thruster
+        //Fake Orientation Thruster
         rigidbody.AddRelativeTorque(Vector3.up * nozzleAngle * TORQUE_MAX);
 
+        //Main Thruster
 	    if (isThrustActive)
 	    {
             Quaternion thrustAngle = Quaternion.AngleAxis(-nozzleAngle * THRUST_VECTORING_ANGLE_MAX, rigidbody.transform.up);
