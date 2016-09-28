@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -18,11 +19,12 @@ public class MagLevSample
             Vector3 position = center + sampleDirection * radius;
 
             //Terminal velocity estimated at 110 m/s
-            float weightConstantPart = 1 - velocity.magnitude / 110;
+            float weightConstantPart = 0;//1 - velocity.magnitude / 110;
             float weightDynamicPart = 1 - weightConstantPart;
 
             Vector3 vProjected = velocity - Vector3.Project(velocity, up);
             float factor = 1 - Vector3.Angle(sampleDirection, vProjected) / 180.0f;
+            factor *= 1.75f;
 
             sampleDirection = sampleOffset * sampleDirection;
             return new MagLevSample(position, -up, weightConstantPart + weightDynamicPart * factor);
@@ -43,12 +45,13 @@ public class EasyMove : MonoBehaviour
     private const float PHYSX_CONTROL_ANGULARDRAG = 2f;
 
     private const float PHYSX_FREEFALL_DRAG = 0.001f;
-    private const float PHYSX_FREEFALL_ANGULARDRAG = 1f;
+    private const float PHYSX_FREEFALL_ANGULARDRAG = 0.001f;
 
     private const float MAGLEV_MAXHEIGHT = 4f;
-    private const float MAGLEV_RADIUS = 6.0f;
+    private const float MAGLEV_RADIUS = 3.0f;
     private const int MAGLEV_SAMPLE_QTY = 8;
 
+    private const float MASS = 5000; //Kg
     private const float TORQUE_MAX = 180000; //Newtons
     private const float THRUST_MAX = 180000; //Newtons
     private const float THRUST_VECTORING_ANGLE_MAX = 30;  //°
@@ -67,9 +70,10 @@ public class EasyMove : MonoBehaviour
         this.engineInSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "EngineInSample"));
         this.engineOutSample = GetComponentsInChildren<AudioSource>().FirstOrDefault(source => string.Equals(source.name, "EngineOutSample"));
 
+        GetComponent<Rigidbody>().mass = MASS;
         GetComponent<Rigidbody>().centerOfMass = CenterOfMass.localPosition;
-        GetComponent<Rigidbody>().drag = PHYSX_CONTROL_DRAG;
-        GetComponent<Rigidbody>().angularDrag = PHYSX_CONTROL_ANGULARDRAG;
+        GetComponent<Rigidbody>().drag = PHYSX_FREEFALL_DRAG;
+        GetComponent<Rigidbody>().angularDrag = PHYSX_FREEFALL_ANGULARDRAG;
     }
 
     private void Update()
@@ -104,6 +108,14 @@ public class EasyMove : MonoBehaviour
 	{
 		Rigidbody rigidbody = GetComponent<Rigidbody>();
 
+        //Gravity
+        rigidbody.AddForce(-Vector3.up * rigidbody.mass * 9.81f);
+
+        //Drag
+        Vector3 vProjected = rigidbody.velocity - Vector3.Project(rigidbody.velocity, Vector3.up);
+        rigidbody.AddForce(-vProjected * rigidbody.mass * PHYSX_CONTROL_DRAG);
+        rigidbody.angularDrag = PHYSX_CONTROL_ANGULARDRAG;
+
         //MagLev
         float maxMagnitudePerSample = rigidbody.mass * 9.81f / MAGLEV_SAMPLE_QTY;
 
@@ -117,10 +129,10 @@ public class EasyMove : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(s.Position, s.Direction, out hit, MAGLEV_MAXHEIGHT))
             {
-                float efficiency = Mathf.Exp(MAGLEV_MAXHEIGHT * 0.5f) / Mathf.Exp(hit.distance);
+                float efficiency = Math.Min(Mathf.Exp(MAGLEV_MAXHEIGHT * 0.5f) / Mathf.Exp(hit.distance), 4);
                 rigidbody.AddForceAtPosition(hit.normal * maxMagnitudePerSample * efficiency * s.Weight, s.Position);
 
-                Debug.DrawRay(s.Position, hit.normal * efficiency * 5, Color.cyan, 0, false);
+                Debug.DrawRay(s.Position, hit.normal * efficiency * s.Weight * 5, Color.cyan, 0, false);
 
                 hitQty++;
             }
@@ -160,7 +172,8 @@ public class EasyMove : MonoBehaviour
 //        GetComponent<Rigidbody>().angularDrag = isFreeFall ? PHYSX_FREEFALL_ANGULARDRAG : PHYSX_CONTROL_ANGULARDRAG;
 
         //Fake Orientation Thruster
-        rigidbody.AddRelativeTorque(Vector3.up * nozzleAngle * TORQUE_MAX);
+        if (hitQty > 0)
+            rigidbody.AddRelativeTorque(Vector3.up * nozzleAngle * TORQUE_MAX);
 
         //Main Thruster
 	    if (isThrustActive)
