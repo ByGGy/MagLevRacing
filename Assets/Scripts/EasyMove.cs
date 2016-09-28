@@ -51,7 +51,7 @@ public class EasyMove : MonoBehaviour
     private const float MAGLEV_RADIUS = 3.0f;
     private const int MAGLEV_SAMPLE_QTY = 8;
 
-    private const float MASS = 5000; //Kg
+    private const float MASS = 6000; //Kg
     private const float TORQUE_MAX = 180000; //Newtons
     private const float THRUST_MAX = 180000; //Newtons
     private const float THRUST_VECTORING_ANGLE_MAX = 30;  //°
@@ -82,7 +82,7 @@ public class EasyMove : MonoBehaviour
         this.isThrustActive = Input.GetButton("Accelerate");
 
         Transform nozzle = this.transform.FindChild("Nozzle");
-        nozzle.transform.localRotation = Quaternion.AngleAxis(-nozzleAngle * THRUST_VECTORING_ANGLE_MAX, nozzle.transform.up);
+        nozzle.transform.localRotation = Quaternion.AngleAxis(-nozzleAngle * THRUST_VECTORING_ANGLE_MAX, Vector3.up);
 
         ParticleSystem smoke = nozzle.FindChild("Smoke").GetComponent<ParticleSystem>();
         var doppleGangerEmission = smoke.emission;
@@ -138,41 +138,8 @@ public class EasyMove : MonoBehaviour
             }
         });
 
-        /*
-        for (int i = 0; i < MAGLEV_SAMPLE_QTY; i++)
-        {
-            RaycastHit hit;
-            float offset = i * 2 * Mathf.PI / MAGLEV_SAMPLE_QTY;
-            Vector3 samplePosition = this.CenterOfMass.position + MAGLEV_RADIUS * Mathf.Cos(offset) * this.transform.forward + MAGLEV_RADIUS * Mathf.Sin(offset) * this.transform.right;
-            Vector3 magLevForceDirection = this.transform.up.normalized;
-            if (Physics.Raycast(samplePosition, -magLevForceDirection, out hit, MAGLEV_MAXHEIGHT))
-            {
-                float cosine = Vector3.Dot(hit.normal, magLevForceDirection);
-                
-                float anotherCosine = Vector3.Dot(hit.normal, -GetComponent<Rigidbody>().velocity.normalized);
-                float antiImpact = 1 + anotherCosine*anotherCosine;// * GetComponent<Rigidbody>().velocity.magnitude;
-                //if (cosine > 0.25f)
-                {
-                    //Efficiency of 1 at MAGLEV_HEIGHT / 2
-                    //float efficiency = cosine * cosine / Mathf.Exp(hit.distance);
-                    float efficiency = Mathf.Exp(MAGLEV_MAXHEIGHT * 0.5f) / Mathf.Exp(hit.distance);
-                    rigidbody.AddForceAtPosition(hit.normal * maxMagnitudePerSample * efficiency * antiImpact, samplePosition);
-                    Debug.DrawRay(samplePosition, hit.normal * maxMagnitudePerSample * efficiency * antiImpact / 500, Color.cyan, 0, false);
-                    hitQty++;
-                }
-            }
-        }*/
-
-        //Drag
-//        bool isFreeFall = hitQty < MAGLEV_SAMPLE_QTY * 0.5f;
-//        float angle = Vector3.Angle(this.transform.forward, GetComponent<Rigidbody>().velocity);
-//        GetComponent<Rigidbody>().drag = PHYSX_CONTROL_DRAG * angle / 180.0f;
-//        GetComponent<Rigidbody>().angularDrag = PHYSX_CONTROL_ANGULARDRAG * angle / 180.0f;
-//        GetComponent<Rigidbody>().drag = isFreeFall ? PHYSX_FREEFALL_DRAG : PHYSX_CONTROL_DRAG;
-//        GetComponent<Rigidbody>().angularDrag = isFreeFall ? PHYSX_FREEFALL_ANGULARDRAG : PHYSX_CONTROL_ANGULARDRAG;
-
         //Fake Orientation Thruster
-        if (hitQty > 0)
+        //if (hitQty > 0)
             rigidbody.AddRelativeTorque(Vector3.up * nozzleAngle * TORQUE_MAX);
 
         //Main Thruster
