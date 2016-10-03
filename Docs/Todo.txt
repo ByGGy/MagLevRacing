@@ -1,5 +1,7 @@
 //TODO MUST
 
+Repo GIT
+	AssetFactory folder should be stored via GitLFS
 	
 //TODO OPTIONAL
 
